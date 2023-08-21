@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: identity-service
+  datasource:
+    url: jdbc:mysql://mysql:3306/auth_db
+    #username: root
+    #password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+  cloud:
+    vault:
+      kv:
+        enabled: true
+        application-name: identity-service
+      authentication: TOKEN
+      token: vOU1OCs0IDS6pjr6xGKgkq9AVWhCrs4fo5dVvuK3UDk
+      scheme: http
+      #      host: vault
+      #      port: 8200
+      uri: http://vault:8200
+  config:
+    import: vault://
+server:
+  port: 8082
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://service-registry:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+logging:
+  level:
+    org:
+      springframework:
+        security: INFO

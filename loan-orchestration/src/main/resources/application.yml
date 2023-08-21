@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: loan-orchestration
+  config:
+    import: configserver:http://config-server:8888
+  profiles:
+    active:
+      - uat
+  cache:
+    type: redis
+  data:
+    redis:
+      host: redis
+      port: 6379
+      ttl: 10
+  kafka:
+    topic:
+      name: orchestration.notification
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      bootstrap-servers: kafka:9092
+      group-id: kafka-java-consumer
+      properties:
+        acks: 1
+#  cloud:
+#    vault:
+#      kv:
+#        enabled: true
+#        application-name: loan-orchestration
+#      authentication: TOKEN
+#      token: vOU1OCs0IDS6pjr6xGKgkq9AVWhCrs4fo5dVvuK3UDk
+#      scheme: http
+#      uri: http://vault:8200
+#    config:
+#      import: vault://
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      register-health-indicator: true
+      sliding-window-size: 10
+      sliding-window-type: count-based
+      minimum-number-of-calls: 5
+      permitted-number-of-calls-in-half-open-state: 3
+      #max-wait-duration-in-half-open-state: 0 // 0 means infinte wait , untill all the permited calls are over
+      automatic-transition-from-open-to-half-open-enabled: true
+      wait-duration-in-open-state: 20s
+      failure-rate-threshold: 50
+      event-consumer-buffer-size: 10
+  instances:
+    userService:
+      base-config: default
+  circuit-breaker-aspect-order: 2
